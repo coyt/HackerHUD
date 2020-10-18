@@ -6,11 +6,6 @@ Multi-use retro style IoT desktop display using a Vacuum Fluorescent Display mod
 <img width="800px" src="https://github.com/coyt/HackerHUD/blob/master/VFDtwo.jpeg"/>
 </p>
 
-#### VFD Desktop Design V1.0
-<p align="center">
-<img width="800px" src=""/>
-</p>
-
 #### Ethereum Price Frame
 <p align="center">
 <img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudEthereum.jpeg"/>
