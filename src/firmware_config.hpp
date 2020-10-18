@@ -62,6 +62,7 @@ SOFTWARE.
 // API info for cryptocurrency price frames:
 /**************************************************************************************************************************/
 //#define CRYPTO_API_KEY "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#define CRYPTO_SERVER_PATH "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC,ETH"
 
 
 /**************************************************************************************************************************/

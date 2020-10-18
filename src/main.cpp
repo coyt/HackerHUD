@@ -467,7 +467,7 @@ void updateDisplayTime(){
   //take hour, convert it to a string, and remove leading zero if present
   std::string myHourString = itoa(myHour,buffer,10);
   myHourString.erase(0, min(myHourString.find_first_not_of('0'), myHourString.size()-1));
-
+ 
   //blink colon and print time 
   if(colonOnLastLoop){
     colonOnLastLoop = false;
