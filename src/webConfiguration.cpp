@@ -24,11 +24,25 @@ SOFTWARE.
 */
 
 #include "webConfiguration.h"
+#include <SPIFFS.h>
 
 extern AsyncWebServer webServer; //the webserver is actually defined in the WiFiManager - DONT TRY TO MAKE A SECOND WEBSERVER HERE
 
 const char* PARAM_INPUT_1 = "output";
 const char* PARAM_INPUT_2 = "state";
+
+//FIX MEEEEEE!! we likely need to reference the instance of FS from wifimanager
+
+extern FS* filesystem;
+#define FileFS        SPIFFS
+#define FS_Name       "SPIFFS"
+
+
+weather_frame_settings weatherFrameSettings;
+staking_frame_settings stakingFrameSettings;
+Crypto_Config myCryptoConfig;
+Stock_Config myStockConfig;
+
 
 /**************************************************************************************************************************/
 // Website
@@ -124,7 +138,7 @@ const char index_html[] PROGMEM = R"rawliteral(
           document.getElementById("humidity").innerHTML = this.responseText;
         }
       };
-      xhttp.open("GET", "/humidity", true);
+      .open("GET", "/humidity", true);
       xhttp.send();
     }, 10000 ) ;
 
@@ -132,6 +146,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 
   //ACTUAL FUNCTIONS HERE NOW
 
+  
     function saveCryptoApiId() {
         // Selecting the input element and get its value 
         let inputVal = document.getElementById("cryptoApiId").value;
@@ -144,11 +159,28 @@ const char index_html[] PROGMEM = R"rawliteral(
         // Selecting the input element and get its value 
         let inputVal = document.getElementById("weatherApiId").value;
         var xhr = new XMLHttpRequest();
+
         xhr.open("GET", "/weatherapi?weatherApiKey="+inputVal, true);
+
+        xhr.onload = function (e) {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              console.log(xhr.responseText);
+              //clear placeholder value first so the new value is visible
+              document.getElementById("weatherApiId").value="";
+              document.getElementById("weatherApiId").placeholder = this.responseText;
+            } else {
+              console.error(xhr.statusText);
+            }
+          }
+        };
+        xhr.onerror = function (e) {
+          console.error(xhr.statusText);
+        };
+
         xhr.send();
     }
-
-    
+  
 </script>
 </body>
 </html>
@@ -159,6 +191,8 @@ const char index_html[] PROGMEM = R"rawliteral(
 // Replaces placeholder with button section in your web page
 /**************************************************************************************************************************/
 String processor(const String& var){
+
+  
   //Serial.println(var);
   if(var == "BUTTONPLACEHOLDER"){
     String buttons = "";
@@ -173,7 +207,12 @@ String processor(const String& var){
   else if(var == "HUMIDITY"){
     return readDHTHumidity();
   }
-  return String();
+  else{
+
+  }
+  
+
+ return String();
 
 }
 
@@ -199,10 +238,16 @@ void setupWebConfigurationInterface(){
 
     Serial.println("***** Starting Web Configuration Interface *****");
 
+    loadConfigDataWebConfig(); //check flash memory for data and update all frame settings and data
+
+    //HERE WE NEED TO INJECT CURRENTLY SET SETTINGS INTO THE WEBPAGE!!! WRITE A NEW FUNCTION TO MODIFY THE WEBPAGE HERE!
+    //After settings have been loaded to webpage - any webserver callbacks require updating of the saved parameters.
 
     // Route for root / web page
     webServer.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
         request->send_P(200, "text/html", index_html, processor);
+        //UPDATE SAVED DATA IN FLASH
+        //UPDATE SETTINGS ON WEBPAGE?
     });
 
     /*
@@ -226,18 +271,26 @@ void setupWebConfigurationInterface(){
         Serial.print(" - Set to: ");
         Serial.println(inputMessage2);
         request->send(200, "text/plain", "OK");
+
+        //UPDATE SAVED DATA IN FLASH
+        //UPDATE SETTINGS ON WEBPAGE?
     });
 
 
     // Send a GET request to <ESP_IP>/temperature
     webServer.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "text/plain", readDHTTemperature().c_str());
+
+    //UPDATE SAVED DATA IN FLASH
     });
 
 
     // Send a GET request to <ESP_IP>/humidity
     webServer.on("/humidity", HTTP_GET, [](AsyncWebServerRequest *request){
       request->send_P(200, "text/plain", readDHTHumidity().c_str());
+
+      //UPDATE SAVED DATA IN FLASH
+      //UPDATE SETTINGS ON WEBPAGE?
     });
 
     */
@@ -245,6 +298,7 @@ void setupWebConfigurationInterface(){
 
     // Send a GET request to <ESP_IP>/
     webServer.on("/cryptoapi", HTTP_GET, [](AsyncWebServerRequest *request){
+      Serial.print("arrived here! ");
       String cryptoApiKey;
       // GET cryptoApiKey on <ESP_IP>/cryptoapi?cryptoApiKey=<inputVal>
       if (request->hasParam("cryptoApiKey")) {
@@ -257,11 +311,16 @@ void setupWebConfigurationInterface(){
       Serial.print("NEW CRYPTO API KEY: ");
       Serial.println(cryptoApiKey);
       request->send(200, "text/plain", "OK");
+
+      //UPDATE SAVED DATA IN FLASH
+      //UPDATE SETTINGS ON WEBPAGE?
     });
 
 
     // Send a GET request to <ESP_IP>/
     webServer.on("/weatherapi", HTTP_GET, [](AsyncWebServerRequest *request){
+      Serial.print("*** savedData: ");
+      Serial.println(weatherFrameSettings.apiKey);
       String weatherApiKey;
       if (request->hasParam("weatherApiKey")) {
         weatherApiKey = request->getParam("weatherApiKey")->value();
@@ -272,11 +331,30 @@ void setupWebConfigurationInterface(){
       }
       Serial.print("NEW WEATHER API KEY: ");
       Serial.println(weatherApiKey);
-      request->send(200, "text/plain", "OK");
+      weatherApiKey = weatherApiKey + "fuk you";
+      Serial.println(weatherApiKey);
+
+      //copy the arduino "String" into the byte array
+      if (strlen(weatherApiKey.c_str()) < sizeof(weatherFrameSettings.apiKey) - 1)
+        strcpy(weatherFrameSettings.apiKey, weatherApiKey.c_str());
+      else
+        //just fulls the buffer as much as it can
+        strncpy(weatherFrameSettings.apiKey, weatherApiKey.c_str(), sizeof(weatherFrameSettings.apiKey) - 1);
+      
+
+      //UPDATE SAVED DATA IN FLASH
+      saveConfigDataWebConfig();
+
+      //UPDATE SETTINGS ON WEBPAGE?
+      //request->send_P(200, "text/html", index_html, processor);
+      Serial.println(weatherFrameSettings.apiKey);
+      request->send_P(200, "text/plain", weatherFrameSettings.apiKey);
     });
 
     // Start server
     webServer.begin();
+
+    Serial.println("***** Finishing Web Configuration Interface from webConfiguration.cpp *****");
 
 }
 
@@ -307,6 +385,54 @@ String readDHTTemperature() {
 
 
 
+/**************************************************************************************************************************/
+// saveConfigData function
+/**************************************************************************************************************************/
+
+
+void saveConfigDataWebConfig(void)
+{
+  File file = FileFS.open(SETTINGS_FILENAME, "w");
+
+  if (file)
+  {
+    file.write((uint8_t*) &weatherFrameSettings, sizeof(weatherFrameSettings));
+    //file.write((uint8_t*) &stakingFrameSettings, sizeof(stakingFrameSettings));
+    //file.write((uint8_t*) &myCryptoConfig, sizeof(myCryptoConfig));
+    //file.write((uint8_t*) &myStockConfig, sizeof(myStockConfig));
+    file.close();
+    //ok!
+  }
+  else
+  {
+    //error
+  }
+}
+
+
+
+/**************************************************************************************************************************/
+// loadConfigData function
+/**************************************************************************************************************************/
+
+void loadConfigDataWebConfig(void)
+{
+  File file = FileFS.open(SETTINGS_FILENAME, "r");
+
+  if (file)
+  {
+    file.readBytes((char *) &weatherFrameSettings, sizeof(weatherFrameSettings));
+    //file.readBytes((char *) &stakingFrameSettings, sizeof(stakingFrameSettings));
+    //file.readBytes((char *) &myCryptoConfig, sizeof(myCryptoConfig));
+    //file.readBytes((char *) &myStockConfig, sizeof(myStockConfig));
+    file.close();
+    //ok!
+  }
+  else
+  {
+    //error
+  }
+}
 
 
 

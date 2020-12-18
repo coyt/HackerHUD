@@ -44,6 +44,79 @@ String outputState(int output);
 String processor(const String& var);
 String readDHTHumidity();
 String readDHTTemperature();
+void saveConfigDataWebConfig(void);
+void loadConfigDataWebConfig(void);
+
+
+#define DEFAULT_DURATION 1000
+#define API_KEY_MAX_LEN 100
+
+
+/**************************************************************************************************************************/
+// Main Configuration Structs
+/**************************************************************************************************************************/
+typedef struct
+{
+  char apiKey[API_KEY_MAX_LEN];         //API key for weather data
+  char location[100];                   //city you reside in
+  bool enabled = false;                 //Weather Frame on or off
+  int duration = DEFAULT_DURATION;      //Duration of weather frame
+}  weather_frame_settings;
+
+
+
+
+typedef struct
+{
+  char apiKey[API_KEY_MAX_LEN];         //API key for staking rig status
+  bool enabled = false;                 //Frame on or off
+  int duration = DEFAULT_DURATION;      //Duration of frame
+}  staking_frame_settings;
+
+
+
+
+typedef struct
+{ 
+  //defines one cryptocurrency frame
+  bool enabled = false;                     
+  int duration = DEFAULT_DURATION;
+  char cryptocurrency_type[40];
+  char currency_type[40];
+
+}  crypto_frame_settings;
+
+#define DEFAULT_NUM_CRYPTO_FRAMES 6
+//defines global crypto frame settings and how many crypto frames exist
+typedef struct
+{
+  char apiKey[API_KEY_MAX_LEN];
+  crypto_frame_settings  cryptoFrames [DEFAULT_NUM_CRYPTO_FRAMES];
+} Crypto_Config;
+
+
+
+
+//defines what is contained in the stock frame itself
+typedef struct
+{
+  //defines one stock price frame
+  bool enabled = false;                     
+  int duration = DEFAULT_DURATION;
+  char stock_type[40];
+  char currency_type[40];
+}  stock_frame_settings;
+
+#define DEFAULT_NUM_STOCK_FRAMES 6
+//defines global stock frame settings and how many stock frames exist
+typedef struct
+{
+  char apiKey[API_KEY_MAX_LEN];
+  stock_frame_settings  stockFrames [DEFAULT_NUM_STOCK_FRAMES];
+} Stock_Config;
+
+
+#define  SETTINGS_FILENAME              F("/settings_cfg.dat")
 
 
 //end of document 

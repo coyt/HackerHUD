@@ -67,6 +67,17 @@ WiFiClient client;
 
 
 /**************************************************************************************************************************/
+// global settings datastructures
+// these structures are ONLY READ from the main.cpp file to update the display
+// the main program control loop checks these settings and updates the VFD accordingly in real-time
+/**************************************************************************************************************************/
+extern weather_frame_settings weatherFrameSettings;
+extern staking_frame_settings stakingFrameSettings;
+extern Crypto_Config myCryptoConfig;
+extern Stock_Config myStockConfig;
+
+
+/**************************************************************************************************************************/
 // setup runs once:
 /**************************************************************************************************************************/
 void setup() {
@@ -82,7 +93,9 @@ void setup() {
   //if wifi portal worked successfully AND we're conected to a network - start config server.
   if(WiFi.status() == WL_CONNECTED){
     killWebConfiguration();
+    Serial.println("***** Starting Web Configuration Interface from MAIN.cpp *****");
     setupWebConfigurationInterface();
+    Serial.println("***** EXITING Web Configuration Interface from MAIN.cpp *****");
   }
 }
 
@@ -137,6 +150,7 @@ void loop() {
     myStateMachineTimers.timerThree = millis();
     //update display frames
     updateDisplayFrames();
+    Serial.println("... Heartbeat ...");
   }
 
   
@@ -158,21 +172,6 @@ void loop() {
   }
 
 
-  /*
-  //hardware test for button one
-  if(buttonOnePressed){
-    buttonOnePressed = false;
-
-    //clear the VFD
-    Serial2.write('\x0C');
-
-    Serial2.println("BUTTON ONE PRESSED");
-
-    delay(2000);
-  }
-  */
-
-
   //hardware test for button two
   if(buttonTwoPressed){
     buttonTwoPressed = false;
@@ -180,7 +179,11 @@ void loop() {
     //clear the VFD
     Serial2.write('\x0C');
 
-    Serial2.println("BUTTON TWO PRESSED");
+    // Print local IP address of VFD
+    Serial2.write('\x0C'); //clear display
+    Serial2.println("WiFi connected.");
+    Serial2.print("IP address: ");
+    Serial2.print(WiFi.localIP());
 
     delay(2000);
 
