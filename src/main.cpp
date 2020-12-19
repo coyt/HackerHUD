@@ -319,37 +319,45 @@ void updateDisplayFrames(){
     frameCycler = 2;
   }
   else if(frameCycler == 2){
-    //home VFD cursor 
-    Serial2.write('\x0B');
 
-    //set overwrite mode
-    Serial2.write('\x1B');
-    Serial2.write('\x11');
-
-    Serial2.println("Tampa Weather  ");
-
-    //clear cursor line and clear string mode
-    Serial2.write('\x18');
-
-    //concatenate to build full string:
-    completeWeatherData = myWeatherData.condition + " : " + myWeatherData.conditionDetailed;
-    stringWeatherDataLength = completeWeatherData.length();
-
-    //check if we're going to overflow the second line - setup and perform scroll if we do. 
-    if(stringWeatherDataLength >= 20){
-
-      Serial.println("We've met conditions to scroll on bottom line");
-      
-      //we need to begin scroll mode for this function - set global flag and timer so we can go back and scroll in main state machine!
-      scrollWeatherDataFlag = true;
-      weatherScrollInterval = INTERVAL_THREE / stringWeatherDataLength;
-      weatherDataPosition = 0;
-
+    if(weatherFrameSettings.enabled == 1){
+      frameCycler = 3; //skip this frame!
     }
     else{
-      Serial2.print(completeWeatherData);
+      //home VFD cursor 
+      Serial2.write('\x0B');
+
+      //set overwrite mode
+      Serial2.write('\x1B');
+      Serial2.write('\x11');
+
+      Serial2.println("Tampa Weather  ");
+
+      //clear cursor line and clear string mode
+      Serial2.write('\x18');
+
+      //concatenate to build full string:
+      completeWeatherData = myWeatherData.condition + " : " + myWeatherData.conditionDetailed;
+      stringWeatherDataLength = completeWeatherData.length();
+
+      //check if we're going to overflow the second line - setup and perform scroll if we do. 
+      if(stringWeatherDataLength >= 20){
+
+        Serial.println("We've met conditions to scroll on bottom line");
+        
+        //we need to begin scroll mode for this function - set global flag and timer so we can go back and scroll in main state machine!
+        scrollWeatherDataFlag = true;
+        weatherScrollInterval = INTERVAL_THREE / stringWeatherDataLength;
+        weatherDataPosition = 0;
+
+      }
+      else{
+        Serial2.print(completeWeatherData);
+      }
+
+      frameCycler = 3;
     }
-    frameCycler = 3;
+
   }
   else if(frameCycler == 3){
     //home VFD cursor 

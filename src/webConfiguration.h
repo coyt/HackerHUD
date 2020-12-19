@@ -59,7 +59,7 @@ typedef struct
 {
   char apiKey[API_KEY_MAX_LEN];         //API key for weather data
   char location[100];                   //city you reside in
-  bool enabled = false;                 //Weather Frame on or off
+  int enabled = false;                 //Weather Frame on or off
   int duration = DEFAULT_DURATION;      //Duration of weather frame
 }  weather_frame_settings;
 

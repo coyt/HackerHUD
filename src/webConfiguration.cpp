@@ -92,16 +92,23 @@ const char index_html[] PROGMEM = R"rawliteral(
   <HR NOSHADE SIZE=10>
 
   <h4>Set your coinmarketcap.com API key here</h4>
-  <input type="text" placeholder="paste your coinmarketcap API key here" id="cryptoApiId">
+  <input type="text" placeholder="paste your coinmarketcap API key here" id="cryptoApiId" size="50">
   <button type="button" onclick="saveCryptoApiId();">Submit</button>
   <h4>Click "Submit" and the api key will be saved.</h4>
+
+  <input type="checkbox" id="cryptoFrameOneEnable" name="cryptoFrameOneEnable" value="on" onchange="cryptoFrameOneEnable(this);">
+  <label for="cryptoFrameOneEnable"> check to enable crpyto frame</label><br>
+
 
   <HR NOSHADE SIZE=10>
 
   <h4>Set your openweathermap.org API key here</h4>
-  <input type="text" placeholder="paste openweathermap.org API key here" id="weatherApiId">
+  <input type="text" placeholder="paste openweathermap.org API key here" id="weatherApiId" size="50">
   <button type="button" onclick="saveWeatherApiId();">Submit</button>
   <h4>Click "Submit" and the api key will be saved.</h4>
+
+  <input type="checkbox" id="weatherFrameEnable" name="weatherFrameEnable" value="on" onchange="weatherFrameEnable(this);">
+  <label for="weatherFrameEnable"> check to enable weather frame</label><br>
 
   <HR NOSHADE SIZE=10>
 
@@ -155,6 +162,15 @@ const char index_html[] PROGMEM = R"rawliteral(
         xhr.send();
     }
 
+    
+    function cryptoFrameOneEnable(element){
+        var xhr = new XMLHttpRequest();
+        if(element.checked){ xhr.open("GET", "/update?cryptoOneFrameEnable=1", true); }
+        else { xhr.open("GET", "/update?cryptoOneFrameEnable=0", true); }
+        xhr.send();
+    }
+    
+
     function saveWeatherApiId() {
         // Selecting the input element and get its value 
         let inputVal = document.getElementById("weatherApiId").value;
@@ -180,7 +196,15 @@ const char index_html[] PROGMEM = R"rawliteral(
 
         xhr.send();
     }
+
+    function weatherFrameEnable(element){
+        var xhr = new XMLHttpRequest();
+        if(element.checked){ xhr.open("GET", "/update?weatherFrameEnable=1", true); }
+        else { xhr.open("GET", "/update?weatherFrameEnable=0", true); }
+        xhr.send();
+    }
   
+
 </script>
 </body>
 </html>
@@ -250,32 +274,36 @@ void setupWebConfigurationInterface(){
         //UPDATE SETTINGS ON WEBPAGE?
     });
 
-    /*
+    
 
     // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
     webServer.on("/update", HTTP_GET, [] (AsyncWebServerRequest *request) {
         String inputMessage1;
-        String inputMessage2;
-        // GET input1 value on <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
-        if (request->hasParam(PARAM_INPUT_1) && request->hasParam(PARAM_INPUT_2)) {
-        inputMessage1 = request->getParam(PARAM_INPUT_1)->value();
-        inputMessage2 = request->getParam(PARAM_INPUT_2)->value();
-        digitalWrite(inputMessage1.toInt(), inputMessage2.toInt());
+
+        // GET weatherFrameEnable
+        if (request->hasParam("weatherFrameEnable")) {
+          inputMessage1 = request->getParam("weatherFrameEnable")->value();
+          weatherFrameSettings.enabled = inputMessage1.toInt();
+          Serial.print("weatherFrameEnable = ");
+          Serial.println(weatherFrameSettings.enabled);
+        }
+        else if(request->hasParam("cryptoOneFrameEnable")){
+          inputMessage1 = request->getParam("cryptoOneFrameEnable")->value();\
+          myCryptoConfig.cryptoFrames[1].enabled = inputMessage1.toInt();
+          Serial.print("cyptoOneFrameEnable = ");
+          Serial.println(myCryptoConfig.cryptoFrames[1].enabled);
         }
         else {
         inputMessage1 = "No message sent";
-        inputMessage2 = "No message sent";
         }
-        Serial.print("GPIO: ");
-        Serial.print(inputMessage1);
-        Serial.print(" - Set to: ");
-        Serial.println(inputMessage2);
+
         request->send(200, "text/plain", "OK");
 
         //UPDATE SAVED DATA IN FLASH
         //UPDATE SETTINGS ON WEBPAGE?
     });
 
+    /*
 
     // Send a GET request to <ESP_IP>/temperature
     webServer.on("/temperature", HTTP_GET, [](AsyncWebServerRequest *request){
