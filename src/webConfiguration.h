@@ -59,7 +59,7 @@ typedef struct
 {
   char apiKey[API_KEY_MAX_LEN];         //API key for weather data
   char location[100];                   //city you reside in
-  int enabled = false;                 //Weather Frame on or off
+  int enabled = false;                  //Weather Frame on or off
   int duration = DEFAULT_DURATION;      //Duration of weather frame
 }  weather_frame_settings;
 
@@ -82,8 +82,6 @@ typedef struct
   bool enabled = false;                     
   int duration = DEFAULT_DURATION;
   char cryptocurrency_type[40];
-  char currency_type[40];
-
 }  crypto_frame_settings;
 
 #define DEFAULT_NUM_CRYPTO_FRAMES 6
@@ -91,6 +89,7 @@ typedef struct
 typedef struct
 {
   char apiKey[API_KEY_MAX_LEN];
+  char currency_type[40];
   crypto_frame_settings  cryptoFrames [DEFAULT_NUM_CRYPTO_FRAMES];
 } Crypto_Config;
 
@@ -104,7 +103,6 @@ typedef struct
   bool enabled = false;                     
   int duration = DEFAULT_DURATION;
   char stock_type[40];
-  char currency_type[40];
 }  stock_frame_settings;
 
 #define DEFAULT_NUM_STOCK_FRAMES 6
@@ -112,6 +110,7 @@ typedef struct
 typedef struct
 {
   char apiKey[API_KEY_MAX_LEN];
+  char currency_type[40];
   stock_frame_settings  stockFrames [DEFAULT_NUM_STOCK_FRAMES];
 } Stock_Config;
 

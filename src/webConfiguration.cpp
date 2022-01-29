@@ -286,12 +286,14 @@ void setupWebConfigurationInterface(){
           weatherFrameSettings.enabled = inputMessage1.toInt();
           Serial.print("weatherFrameEnable = ");
           Serial.println(weatherFrameSettings.enabled);
+          saveConfigDataWebConfig();
         }
         else if(request->hasParam("cryptoOneFrameEnable")){
           inputMessage1 = request->getParam("cryptoOneFrameEnable")->value();\
           myCryptoConfig.cryptoFrames[1].enabled = inputMessage1.toInt();
           Serial.print("cyptoOneFrameEnable = ");
           Serial.println(myCryptoConfig.cryptoFrames[1].enabled);
+          saveConfigDataWebConfig();
         }
         else {
         inputMessage1 = "No message sent";

@@ -182,15 +182,15 @@ void loop() {
 
     // Print local IP address of VFD
     Serial2.write('\x0C'); //clear display
-    Serial2.println("WiFi connected.");
-    Serial2.print("IP address: ");
+    Serial2.println("WiFi connected");
+    Serial2.print("IP: ");
     Serial2.print(WiFi.localIP());
 
     delay(2000);
 
   }
 
- 
+
 
 }
 
@@ -321,8 +321,9 @@ void updateDisplayFrames(){
   }
   else if(frameCycler == 2){
 
-    if(weatherFrameSettings.enabled == 1){
-      frameCycler = 3; //skip this frame!
+    if(weatherFrameSettings.enabled == 0){
+      frameCycler = 0; //skip BOTH weather frames!
+      Serial.println(weatherFrameSettings.enabled);
     }
     else{
       //home VFD cursor 
