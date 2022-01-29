@@ -63,7 +63,7 @@ SOFTWARE.
 #define INTERVAL_ONE    100
 #define INTERVAL_TWO    1000
 #define INTERVAL_THREE  10000
-#define INTERVAL_FOUR   900000
+#define INTERVAL_FOUR   900000 //900000ms = 900 seconds = 15 minutes
 
 
 /**************************************************************************************************************************/

@@ -155,8 +155,9 @@ void loop() {
 
   
   //update crypto prices
-  if(firstBoot || millis() - myStateMachineTimers.timerFour >= INTERVAL_FOUR){
+  if(firstBoot || (millis() - myStateMachineTimers.timerFour >= INTERVAL_FOUR)){
     firstBoot = false;
+    Serial.println("... Fetching new API data ...");
     myStateMachineTimers.timerFour = millis();
     getAndParseCryptoPrice();
     getAndParseWeather();
@@ -571,7 +572,7 @@ void getAndParseCryptoPrice(){
 // parse the JSON response from the ETHEREUM API
 /**************************************************************************************************************************/
 void parseCryptoJson( String json ) {
-  DynamicJsonDocument doc(2048);
+  DynamicJsonDocument doc(4096);
   DeserializationError error = deserializeJson(doc, json);
   if (error){
     Serial.println(error.c_str());
