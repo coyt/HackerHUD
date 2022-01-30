@@ -29,12 +29,28 @@ SOFTWARE.
 #include "firmware.h"
 
 
+
+/**************************************************************************************************************************/
+// global settings datastructures
+// these structures are ONLY READ from the main.cpp file to update the display
+// the main program control loop checks these settings and updates the VFD accordingly in real-time
+/**************************************************************************************************************************/
+extern weather_frame_settings weatherFrameSettings;
+extern staking_frame_settings stakingFrameSettings;
+extern Crypto_Config myCryptoConfig;
+extern Stock_Config myStockConfig;
+extern time_settings myTimeConfig;
+
+//load variables into these structs here
+//f8ffd4de380fb081bfc12d4ee8c82d29
+
 /**************************************************************************************************************************/
 // misc variables:
 /**************************************************************************************************************************/
-const char* ntpServer = NTP_SERVER;
-const long  gmtOffset_sec = GMT_OFFSET_SEC;
-const int   daylightOffset_sec = DAYLIGHT_OFFSET_SEC;
+const char* ntpServer = myTimeConfig.ntpServer;
+const long  gmtOffset_sec = myTimeConfig.gmtOffset_sec;
+const int   daylightOffset_sec = myTimeConfig.daylightOffset_sec;
+
 unsigned long counter = 0;
 bool colonOnLastLoop = false;
 volatile bool buttonOnePressed = false;
@@ -66,15 +82,7 @@ int weatherDataPosition = 0;
 WiFiClient client;
 
 
-/**************************************************************************************************************************/
-// global settings datastructures
-// these structures are ONLY READ from the main.cpp file to update the display
-// the main program control loop checks these settings and updates the VFD accordingly in real-time
-/**************************************************************************************************************************/
-extern weather_frame_settings weatherFrameSettings;
-extern staking_frame_settings stakingFrameSettings;
-extern Crypto_Config myCryptoConfig;
-extern Stock_Config myStockConfig;
+
 
 
 /**************************************************************************************************************************/
@@ -521,7 +529,7 @@ void updateDisplayTime(){
 /**************************************************************************************************************************/
 void getAndParseCryptoPrice(){
 
-  String apiKey = CRYPTO_API_KEY;
+  String apiKey = myCryptoConfig.apiKey;
 
   //Check WiFi connection status
     if(WiFi.status()== WL_CONNECTED){
@@ -590,9 +598,9 @@ void getAndParseWeather(){
 
   //Check WiFi connection status
     if(WiFi.status()== WL_CONNECTED){
-      HTTPClient http;
+      HTTPClient http; 
 
-    String serverPath = WEATHER_SERVER_PATH ;
+    String serverPath = WEATHER_SERVER_PATH + String(weatherFrameSettings.apiKey);
 
     // Your Domain name with URL path or IP address with path
     http.begin(serverPath.c_str());

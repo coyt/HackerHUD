@@ -42,6 +42,7 @@ weather_frame_settings weatherFrameSettings;
 staking_frame_settings stakingFrameSettings;
 Crypto_Config myCryptoConfig;
 Stock_Config myStockConfig;
+time_settings myTimeConfig;
 
 
 /**************************************************************************************************************************/
@@ -83,7 +84,7 @@ void setupWebConfigurationInterface(){
         //request->send_P(200, "text/html", index_html, processor);
         request->send(SPIFFS, "/indexConfig.html", String(), false, processor);
         //UPDATE SAVED DATA IN FLASH
-        //UPDATE SETTINGS ON WEBPAGE? 
+        //UPDATE SETTINGS ON WEBPAGE?
     });
 
     // Route to load style.css file
@@ -96,6 +97,13 @@ void setupWebConfigurationInterface(){
         String inputMessage1;
 
         // GET weatherFrameEnable
+        if (request->hasParam("timeEnable")) {
+          inputMessage1 = request->getParam("timeEnable")->value();
+          myTimeConfig.enabled = inputMessage1.toInt();
+          Serial.print("timeEnable = ");
+          Serial.println(myTimeConfig.enabled);
+          saveConfigDataWebConfig();
+        }
         if (request->hasParam("weatherFrameEnable")) {
           inputMessage1 = request->getParam("weatherFrameEnable")->value();
           weatherFrameSettings.enabled = inputMessage1.toInt();
@@ -142,38 +150,78 @@ void setupWebConfigurationInterface(){
     });
 
 
-    // Send a GET request to <ESP_IP>/
+    // Send a GET request to ESP32 to update timezone NTP Server
     webServer.on("/weatherapi", HTTP_GET, [](AsyncWebServerRequest *request){
-      Serial.print("*** savedData: ");
-      Serial.println(weatherFrameSettings.apiKey);
       String weatherApiKey;
       if (request->hasParam("weatherApiKey")) {
         weatherApiKey = request->getParam("weatherApiKey")->value();
       }
       else {
-        //weatherApiKey = OLD_WEATHER_KEY; //failed to update weather api key
         Serial.println("Failed to receive weatherapi key from browser");
       }
-      Serial.print("NEW WEATHER API KEY: ");
-      Serial.println(weatherApiKey);
-      weatherApiKey = weatherApiKey + "fuk you";
-      Serial.println(weatherApiKey);
 
       //copy the arduino "String" into the byte array
       if (strlen(weatherApiKey.c_str()) < sizeof(weatherFrameSettings.apiKey) - 1)
         strcpy(weatherFrameSettings.apiKey, weatherApiKey.c_str());
       else
-        //just fulls the buffer as much as it can
+        //fill buffer as much as it can
         strncpy(weatherFrameSettings.apiKey, weatherApiKey.c_str(), sizeof(weatherFrameSettings.apiKey) - 1);
       
+      //Update Saved / Persistent Flash Data
+      saveConfigDataWebConfig(); 
 
-      //UPDATE SAVED DATA IN FLASH
-      saveConfigDataWebConfig();
+      //Update key on webpage so state is reflected
+      request->send_P(200, "text/plain", String(weatherFrameSettings.apiKey).c_str());
+    });
 
-      //UPDATE SETTINGS ON WEBPAGE?
-      //request->send_P(200, "text/html", index_html, processor);
-      Serial.println(weatherFrameSettings.apiKey);
-      request->send_P(200, "text/plain", weatherFrameSettings.apiKey);
+
+    // Send a GET request to ESP32 to update weather API key
+    webServer.on("/weatherapi", HTTP_GET, [](AsyncWebServerRequest *request){
+      String weatherApiKey;
+      if (request->hasParam("weatherApiKey")) {
+        weatherApiKey = request->getParam("weatherApiKey")->value();
+      }
+      else {
+        Serial.println("Failed to receive weatherapi key from browser");
+      }
+
+      //copy the arduino "String" into the byte array
+      if (strlen(weatherApiKey.c_str()) < sizeof(weatherFrameSettings.apiKey) - 1)
+        strcpy(weatherFrameSettings.apiKey, weatherApiKey.c_str());
+      else
+        //fill buffer as much as it can
+        strncpy(weatherFrameSettings.apiKey, weatherApiKey.c_str(), sizeof(weatherFrameSettings.apiKey) - 1);
+      
+      //Update Saved / Persistent Flash Data
+      saveConfigDataWebConfig(); 
+
+      //Update key on webpage so state is reflected
+      request->send_P(200, "text/plain", String(weatherFrameSettings.apiKey).c_str());
+    });
+
+    //Browser Request for info - just provide data - don't save
+    webServer.on("/timezoneOffset", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/plain", String(myTimeConfig.gmtOffset_sec).c_str());
+    });
+
+    //Browser Request for info - just provide data - don't save
+    webServer.on("/ntpServer", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/plain", String(myTimeConfig.ntpServer).c_str());
+    });
+
+    //Browser Request for info - just provide data - don't save
+    webServer.on("/daylightOffset", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/plain", String(myTimeConfig.daylightOffset_sec).c_str());
+    });
+
+    //Browser Request for info - just provide data - don't save
+    webServer.on("/weatherApiKey", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/plain", String(weatherFrameSettings.apiKey).c_str());
+    });
+
+    //Browser Request for info - just provide data - don't save
+    webServer.on("/cryptoApiKey", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send_P(200, "text/plain", String(myCryptoConfig.apiKey).c_str());
     });
 
     // Start server
@@ -207,6 +255,7 @@ void saveConfigDataWebConfig(void)
     //file.write((uint8_t*) &stakingFrameSettings, sizeof(stakingFrameSettings));
     //file.write((uint8_t*) &myCryptoConfig, sizeof(myCryptoConfig));
     //file.write((uint8_t*) &myStockConfig, sizeof(myStockConfig));
+    file.write((uint8_t*) &myTimeConfig, sizeof(myTimeConfig));
     file.close();
     //ok!
   }
@@ -232,6 +281,7 @@ void loadConfigDataWebConfig(void)
     //file.readBytes((char *) &stakingFrameSettings, sizeof(stakingFrameSettings));
     //file.readBytes((char *) &myCryptoConfig, sizeof(myCryptoConfig));
     //file.readBytes((char *) &myStockConfig, sizeof(myStockConfig));
+    file.readBytes((char *) &myTimeConfig, sizeof(myTimeConfig));
     file.close();
     //ok!
   }

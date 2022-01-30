@@ -26,7 +26,9 @@ SOFTWARE.
 #ifndef FIRMWARE_CONFIG_H
 #define FIRMWARE_CONFIG_H
 
-#include <secrets.hpp>
+//#include <secrets.hpp>
+
+#define WEATHER_SERVER_PATH "http://api.openweathermap.org/data/2.5/weather?q=Tampa,US&APPID="
 
 /**************************************************************************************************************************/
 // Wifi Network Credentials - replace with yours:
@@ -35,12 +37,7 @@ SOFTWARE.
 //const char* password = "xxxxxxxx";
 
 
-/**************************************************************************************************************************/
-// NTP Server & Time Info - replace with yours:
-/**************************************************************************************************************************/
-#define NTP_SERVER          "pool.ntp.org"
-#define GMT_OFFSET_SEC      -18000 //for EST
-#define DAYLIGHT_OFFSET_SEC 3600
+
 
 
 /**************************************************************************************************************************/

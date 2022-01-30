@@ -7,21 +7,9 @@
 
     <link rel="icon" href="data:,">
 
-
     <style>
     html {text-align: center;}
-        /*
-    body {max-width: 800px;}
-    /*
-    .switch {position: relative; display: inline-block; width: 120px; height: 68px} 
-    .switch input {display: none}
-    .slider {position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; border-radius: 6px}
-    .slider:before {position: absolute; content: ""; height: 52px; width: 52px; left: 8px; bottom: 8px; background-color: #fff; -webkit-transition: .4s; transition: .4s; border-radius: 3px}
-    input:checked+.slider {background-color: #b30000}
-    input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
-    */
     </style>
-
 
     <link rel="stylesheet" type="text/css" href="milligram.css">
 
@@ -40,28 +28,107 @@
 <body>
     <div class = "container">
 
+        <p>
+        </p>
+
         <h3>HackerHUD WEB Configuration Interface</h3>
+        <h6>Designed by Coyt Barringer - 2022</h6>
+        <a href="https://github.com/coyt/HackerHUD">
+          https://github.com/coyt/HackerHUD
+        </a>
 
         <HR NOSHADE SIZE=10>
 
-        <h4>Set your coinmarketcap.com API key here</h4>
-        <input type="text" placeholder="paste your coinmarketcap API key here" id="cryptoApiId" size="50">
-        <button type="button" onclick="saveCryptoApiId();">Submit</button>
-        <h4>Click "Submit" and the api key will be saved.</h4>
-
-        <input type="checkbox" id="cryptoFrameOneEnable" name="cryptoFrameOneEnable" value="on" onchange="cryptoFrameOneEnable(this);">
-        <label for="cryptoFrameOneEnable"> check to enable crpyto frame</label><br>
-
+        <!-- Time and Timezone settings -->
+        <h4>Time & Timezone Settings</h4>
+        <div class="row">
+          <div class="column">
+            <h5>Set timezone offset:</h5>
+          </div>
+          <div class="column column-50">
+            <input type="text" placeholder="timezone offset" id="timezoneOffset" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveTimeOffset();">Submit</button>
+          </div>
+          <div class="column">
+            <input type="checkbox" id="timeEnabled" name="timeEnagled" value="on" onchange="timeEnable(this);">
+            <label class="float-right" for="weatherFrameEnable"> display time</label><br>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <h5>Set NTP Server:</h5>
+          </div>
+          <div class="column column-50">
+            <input type="text" placeholder="NTP server" id="ntpServer" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveNtpServer();">Submit</button>
+          </div>
+          <div class="column">
+          </div>
+        </div>
+        <div class="row">
+          <div class="column">
+            <h5>Daylight Offset Secs:</h5>
+          </div>
+          <div class="column column-50">
+            <input type="text" placeholder="daylight offset seconds" id="daylightOffsetSeconds" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveDaylightOffset();">Submit</button>
+          </div>
+          <div class="column">
+          </div>
+        </div>
 
         <HR NOSHADE SIZE=10>
 
-        <h4>Set your openweathermap.org API key here</h4>
-        <input type="text" placeholder="paste openweathermap.org API key here" id="weatherApiId" size="50">
-        <button type="button" onclick="saveWeatherApiId();">Submit</button>
-        <h4>Click "Submit" and the api key will be saved.</h4>
+        <!-- Weather Settings -->
+        <h4>Set your <a href="https://openweathermap.org/">openweathermap.org</a> API key here</h4>
+        <div class="row">
+          <div class="column column-50">
+            <input type="text" placeholder="paste openweathermap.org API key here" id="weatherApiId" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveWeatherApiId();">Submit</button>
+          </div>
+          <div class="column">
+            <input type="checkbox" id="weatherFrameEnable" name="weatherFrameEnable" value="on" onchange="weatherFrameEnable(this);">
+            <label class="float-right" for="weatherFrameEnable"> enable weather frame</label><br>
+          </div>
+        </div>
 
-        <input type="checkbox" id="weatherFrameEnable" name="weatherFrameEnable" value="on" onchange="weatherFrameEnable(this);">
-        <label for="weatherFrameEnable"> check to enable weather frame</label><br>
+        <HR NOSHADE SIZE=10>
+
+        <h4>Set your <a href="https://coinmarketcap.com/">coinmarketcap.com</a> API key here</h4>
+        <div class="row">
+          <div class="column column-50">
+            <input type="text" placeholder="paste your coinmarketcap API key here" id="cryptoApiId" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveCryptoApiId();">Submit</button>
+          </div>
+          <div class="column">
+            <h5>Click "Submit" and the api key will be saved.</h5>
+          </div>
+        </div>
+
+        <HR NOSHADE SIZE=10>
+
+        <!-- CONTROL NUMBER OF CRPYTO FRAMES - defualt is two -->
+          <div class="row">
+              <button type="button" onclick="addRow();">add a crypto frame</button>
+          </div>
+          <p></p>
+
+          <div id="content">
+          </div>
+
+        <!-- Crypto Ticker List -->
+        <div class="row">
+        </div>
 
         <HR NOSHADE SIZE=10>
 
@@ -118,7 +185,106 @@
         else { xhr.open("GET", "/update?weatherFrameEnable=0", true); }
         xhr.send();
     }
-  
+
+    function timeEnable(element){
+        var xhr = new XMLHttpRequest();
+        if(element.checked){ xhr.open("GET", "/update?timeEnable=1", true); }
+        else { xhr.open("GET", "/update?timeEnable=0", true); }
+        xhr.send();
+    }
+
+    function addRow() {
+        const div = document.createElement('div');
+
+        div.className = 'row';
+
+        div.innerHTML = `
+        <div class="column">
+            <input type="text" placeholder="enter crypto ticker" id="cryptoTickerOne" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveCryptoApiId();">Submit</button>
+          </div>
+          <div class="column">
+            <input type="text" placeholder="enter time for frame" id="cryptoTickerOneTime" size="50">
+          </div>
+          <div class="column">
+            <button type="button" onclick="saveCryptoApiId();">Submit</button>
+          </div>
+          <div class="column">
+            <input type="checkbox" id="cryptoFrameOneEnable" name="cryptoFrameOneEnable" value="on" onchange="cryptoFrameOneEnable(this);">
+            <label class="float-right" for="cryptoFrameOneEnable"> enable this frame</label>
+          </div>
+          <div class="column">
+            <button type="button" value="-" onclick="removeRow(this);">Remove</button>
+          </div>
+        `;
+
+        document.getElementById('content').appendChild(div);
+    }
+
+    function removeRow(input) {
+        document.getElementById('content').removeChild(input.parentNode.parentNode);
+    }
+
+
+    setInterval(function ( ) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("timezoneOffset").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "/timezoneOffset", true);
+      xhttp.send();
+    }, 10000 ) ;
+
+    setInterval(function ( ) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("ntpServer").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "/ntpServer", true);
+      xhttp.send();
+    }, 10000 ) ;
+
+    setInterval(function ( ) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("daylightOffsetSeconds").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "/daylightOffset", true);
+      xhttp.send();
+    }, 10000 ) ;
+
+    setInterval(function ( ) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("weatherApiId").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "/weatherApiKey", true);
+      xhttp.send();
+    }, 10000 ) ;
+
+    setInterval(function ( ) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("cryptoApiId").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "/cryptoApiKey", true);
+      xhttp.send();
+    }, 10000 ) ;
+
+
+
 
 </script>
 </body>

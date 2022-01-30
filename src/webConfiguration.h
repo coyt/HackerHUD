@@ -33,6 +33,7 @@ SOFTWARE.
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <secrets.hpp>
 
 
 /**************************************************************************************************************************/
@@ -49,12 +50,33 @@ void loadConfigDataWebConfig(void);
 #define API_KEY_MAX_LEN 100
 
 
+
+/**************************************************************************************************************************/
+// NTP Server & Time Info defaults - replace with yours:
+/**************************************************************************************************************************/
+#define NTP_SERVER          "pool.ntp.org"
+#define GMT_OFFSET_SEC      -18000 //for EST
+#define DAYLIGHT_OFFSET_SEC 3600
+
+
+
 /**************************************************************************************************************************/
 // Main Configuration Structs
 /**************************************************************************************************************************/
 typedef struct
 {
-  char apiKey[API_KEY_MAX_LEN];         //API key for weather data
+  const char* ntpServer = NTP_SERVER;         
+  const long gmtOffset_sec = GMT_OFFSET_SEC;               
+  int enabled = false;                                      //time on or off
+  const int daylightOffset_sec = DAYLIGHT_OFFSET_SEC;  
+}  time_settings;
+
+
+
+
+typedef struct
+{
+  char apiKey[API_KEY_MAX_LEN] = WEATHER_API_KEY;         //API key for weather data
   char location[100];                   //city you reside in
   int enabled = false;                  //Weather Frame on or off
   int duration = DEFAULT_DURATION;      //Duration of weather frame
@@ -85,7 +107,7 @@ typedef struct
 //defines global crypto frame settings and how many crypto frames exist
 typedef struct
 {
-  char apiKey[API_KEY_MAX_LEN];
+  char apiKey[API_KEY_MAX_LEN] = CRYPTO_API_KEY;
   char currency_type[40];
   crypto_frame_settings  cryptoFrames [DEFAULT_NUM_CRYPTO_FRAMES];
 } Crypto_Config;
