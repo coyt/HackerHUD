@@ -88,7 +88,7 @@ void setupWebConfigurationInterface(){
 
     // Route to load style.css file
     webServer.on("/style.css", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send(SPIFFS, "/indexCSS.css", "text/css");
+      request->send(SPIFFS, "/milligram.css", "text/css");
     });
 
     // Send a GET request to <ESP_IP>/update?output=<inputMessage1>&state=<inputMessage2>
