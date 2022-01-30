@@ -40,10 +40,7 @@ SOFTWARE.
 /**************************************************************************************************************************/
 void setupWebConfigurationInterface();
 void  killWebConfiguration();
-String outputState(int output);
 String processor(const String& var);
-String readDHTHumidity();
-String readDHTTemperature();
 void saveConfigDataWebConfig(void);
 void loadConfigDataWebConfig(void);
 
