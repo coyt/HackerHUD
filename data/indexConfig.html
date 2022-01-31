@@ -145,29 +145,29 @@
         else { xhr.open("GET", "/timeBool?timeEnable=0", true); }
         xhr.send();
     }
+    
+    function myGet(url, fun) {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            fun(this.responseText);
+        }
+      };
+      xhttp.open("GET", url, true);
+      xhttp.send();
+    }
 
     function myFun(id, url) {
         // Selecting the input element and get its value 
         let inputVal = document.getElementById(id).value;
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("GET", url+inputVal, true);
-
-        xhr.onload = function (e) {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              console.log(xhr.responseText);
-              //clear placeholder value first so the new value is visible
-              document.getElementById(id).value="";
-              document.getElementById(id).placeholder = this.responseText;
-            } else {
-              console.error(xhr.statusText);
+        myGet(url+inputVal,
+            function (responseText) {
+                  console.log(responseText);
+                  //clear placeholder value first so the new value is visible
+                  document.getElementById(id).value="";
+                  document.getElementById(id).placeholder = responseText;
             }
-          }
-        };
-        xhr.onerror = function (e) {
-          console.error(xhr.statusText);
-        };
+          );
 
         xhr.send();
     }
@@ -185,30 +185,24 @@
     }
 
     function updateTimeEnable(){
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          if(this.responseText == 1){
+      myGet("/timeEnableSync",
+        function(responseText) {
+          if(responseText == 1){
             document.getElementById("timeEnabled").checked = true;
           }
           else{
             document.getElementById("timeEnabled").checked = false;
           }   
-        }
-      };
-      xhttp.open("GET", "/timeEnableSync", true);
-      xhttp.send();
+          }
+       );
     }
 
     function updatetimezoneOffset(){
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById("timezoneOffset").placeholder = this.responseText;
-        }
-      };
-      xhttp.open("GET", "/timezoneOffsetSync", true);
-      xhttp.send();
+        myGet("/timezoneOffsetSync",
+          function(responseText) {
+            document.getElementById("timezoneOffset").placeholder = responseText;
+          }
+         );
     }
 
     function updateNtpServer(){
