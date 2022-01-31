@@ -44,6 +44,9 @@ void  killWebConfiguration();
 String processor(const String& var);
 void saveConfigDataWebConfig(void);
 void loadConfigDataWebConfig(void);
+void setupTimeAndTimezoneRoutes(void);
+void setupWeatherRoutes(void);
+void setupCryptoRoutes(void);
 
 
 #define DEFAULT_DURATION 1000
@@ -65,10 +68,10 @@ void loadConfigDataWebConfig(void);
 /**************************************************************************************************************************/
 typedef struct
 {
-  const char* ntpServer = NTP_SERVER;         
-  const long gmtOffset_sec = GMT_OFFSET_SEC;               
-  int enabled = false;                                      //time on or off
-  const int daylightOffset_sec = DAYLIGHT_OFFSET_SEC;  
+  char* ntpServer = NTP_SERVER;         
+  long gmtOffset_sec = GMT_OFFSET_SEC;               
+  int enabled = true;                                      //time on or off
+  int daylightOffset_sec = DAYLIGHT_OFFSET_SEC;  
 }  time_settings;
 
 
@@ -78,7 +81,7 @@ typedef struct
 {
   char apiKey[API_KEY_MAX_LEN] = WEATHER_API_KEY;         //API key for weather data
   char location[100];                   //city you reside in
-  int enabled = false;                  //Weather Frame on or off
+  int enabled = true;                  //Weather Frame on or off
   int duration = DEFAULT_DURATION;      //Duration of weather frame
 }  weather_frame_settings;
 

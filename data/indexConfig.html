@@ -49,11 +49,11 @@
             <input type="text" placeholder="timezone offset" id="timezoneOffset" size="50">
           </div>
           <div class="column">
-            <button type="button" onclick="saveTimeOffset();">Submit</button>
+            <button type="button" onclick="saveTimeZoneOffset();">Submit</button>
           </div>
           <div class="column">
-            <input type="checkbox" id="timeEnabled" name="timeEnagled" value="on" onchange="timeEnable(this);">
-            <label class="float-right" for="weatherFrameEnable"> display time</label><br>
+            <input type="checkbox" id="timeEnabled" name="timeEnagled" onchange="timeEnable(this);">
+            <label class="float-right"> display time</label><br>
           </div>
         </div>
         <div class="row">
@@ -136,22 +136,167 @@
 
 <script>
 
-    function saveCryptoApiId() {
-        // Selecting the input element and get its value 
-        let inputVal = document.getElementById("cryptoApiId").value;
+    /***********************************************************************
+    / Scripts for time & timezone settings
+    /***********************************************************************/
+    function timeEnable(element){
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/cryptoapi?cryptoApiKey="+inputVal, true);
+        if(element.checked){ xhr.open("GET", "/timeBool?timeEnable=1", true); }
+        else { xhr.open("GET", "/timeBool?timeEnable=0", true); }
         xhr.send();
     }
 
-    
-    function cryptoFrameOneEnable(element){
+    function saveTimeZoneOffset() {
+        // Selecting the input element and get its value 
+        let inputVal = document.getElementById("timezoneOffset").value;
         var xhr = new XMLHttpRequest();
-        if(element.checked){ xhr.open("GET", "/update?cryptoOneFrameEnable=1", true); }
-        else { xhr.open("GET", "/update?cryptoOneFrameEnable=0", true); }
+
+        xhr.open("GET", "/timezoneoffsetRX?timezoneOffset="+inputVal, true);
+
+        xhr.onload = function (e) {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              console.log(xhr.responseText);
+              //clear placeholder value first so the new value is visible
+              document.getElementById("timezoneOffset").value="";
+              document.getElementById("timezoneOffset").placeholder = this.responseText;
+            } else {
+              console.error(xhr.statusText);
+            }
+          }
+        };
+        xhr.onerror = function (e) {
+          console.error(xhr.statusText);
+        };
+
         xhr.send();
     }
-    
+
+    function saveNtpServer() {
+        // Selecting the input element and get its value 
+        let inputVal = document.getElementById("ntpServer").value;
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("GET", "/ntpServerRX?ntpServer="+inputVal, true);
+
+        xhr.onload = function (e) {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              console.log(xhr.responseText);
+              //clear placeholder value first so the new value is visible
+              document.getElementById("ntpServer").value="";
+              document.getElementById("ntpServer").placeholder = this.responseText;
+            } else {
+              console.error(xhr.statusText);
+            }
+          }
+        };
+        xhr.onerror = function (e) {
+          console.error(xhr.statusText);
+        };
+
+        xhr.send();
+    }
+
+    function saveDaylightOffset() {
+        // Selecting the input element and get its value 
+        let inputVal = document.getElementById("daylightOffsetSeconds").value;
+        var xhr = new XMLHttpRequest();
+
+        xhr.open("GET", "/daylightOffsetSecondsRX?daylightOffsetSeconds="+inputVal, true);
+
+        xhr.onload = function (e) {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              console.log(xhr.responseText);
+              //clear placeholder value first so the new value is visible
+              document.getElementById("daylightOffsetSeconds").value="";
+              document.getElementById("daylightOffsetSeconds").placeholder = this.responseText;
+            } else {
+              console.error(xhr.statusText);
+            }
+          }
+        };
+        xhr.onerror = function (e) {
+          console.error(xhr.statusText);
+        };
+
+        xhr.send();
+    }
+
+    function updateTimeEnable(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          if(this.responseText == 1){
+            document.getElementById("timeEnabled").checked = true;
+          }
+          else{
+            document.getElementById("timeEnabled").checked = false;
+          }   
+        }
+      };
+      xhttp.open("GET", "/timeEnableSync", true);
+      xhttp.send();
+    }
+
+    function updatetimezoneOffset(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("timezoneOffset").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "/timezoneOffsetSync", true);
+      xhttp.send();
+    }
+
+    function updateNtpServer(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("ntpServer").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "ntpServerSync", true);
+      xhttp.send();
+    }
+
+    function updateDaylightOffsetSeconds(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("daylightOffsetSeconds").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "daylightOffsetSync", true);
+      xhttp.send();
+    }
+
+    //load params from ESP32 on first page load
+    window.onload = updateTimeEnable();
+    window.onload = updatetimezoneOffset();
+    window.onload = updateNtpServer();
+    window.onload = updateDaylightOffsetSeconds();
+
+    //every X seconds, re-sync state of browser with ESP32
+    setInterval(function () {
+      updateTimeEnable();
+      updatetimezoneOffset();
+      updateNtpServer();
+      updateDaylightOffsetSeconds();
+    }, 10000);
+
+
+    /***********************************************************************
+    / Scripts for weather settings
+    /***********************************************************************/
+    function weatherFrameEnable(element){
+        var xhr = new XMLHttpRequest();
+        if(element.checked){ xhr.open("GET", "/weatherBool?weatherEnable=1", true); }
+        else { xhr.open("GET", "/weatherBool?weatherEnable=0", true); }
+        xhr.send();
+    }
 
     function saveWeatherApiId() {
         // Selecting the input element and get its value 
@@ -179,17 +324,59 @@
         xhr.send();
     }
 
-    function weatherFrameEnable(element){
+    function updateWeatherAPI(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById("weatherApiId").placeholder = this.responseText;
+        }
+      };
+      xhttp.open("GET", "weatherApiSync", true);
+      xhttp.send();
+    }
+
+    function updateWeatherEnable(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          if(this.responseText == 1){
+            document.getElementById("weatherFrameEnable").checked = true;
+          }
+          else{
+            document.getElementById("weatherFrameEnable").checked = false;
+          }   
+        }
+      };
+      xhttp.open("GET", "weatherEnableSync", true);
+      xhttp.send();
+    }
+
+    //load params from ESP32 on first page load
+    window.onload = updateWeatherAPI();
+    window.onload = updateWeatherEnable();
+
+    //every X seconds, re-sync state of browser with ESP32
+    setInterval(function () {
+      updateWeatherAPI();
+      updateWeatherEnable();
+    }, 10000);
+
+    
+    /***********************************************************************
+    / Scripts for crypto frame settings
+    /***********************************************************************/
+    function saveCryptoApiId() {
+        // Selecting the input element and get its value 
+        let inputVal = document.getElementById("cryptoApiId").value;
         var xhr = new XMLHttpRequest();
-        if(element.checked){ xhr.open("GET", "/update?weatherFrameEnable=1", true); }
-        else { xhr.open("GET", "/update?weatherFrameEnable=0", true); }
+        xhr.open("GET", "/cryptoapi?cryptoApiKey="+inputVal, true);
         xhr.send();
     }
 
-    function timeEnable(element){
+    function cryptoFrameOneEnable(element){
         var xhr = new XMLHttpRequest();
-        if(element.checked){ xhr.open("GET", "/update?timeEnable=1", true); }
-        else { xhr.open("GET", "/update?timeEnable=0", true); }
+        if(element.checked){ xhr.open("GET", "/update?cryptoOneFrameEnable=1", true); }
+        else { xhr.open("GET", "/update?cryptoOneFrameEnable=0", true); }
         xhr.send();
     }
 
@@ -227,51 +414,6 @@
         document.getElementById('content').removeChild(input.parentNode.parentNode);
     }
 
-
-    setInterval(function ( ) {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById("timezoneOffset").placeholder = this.responseText;
-        }
-      };
-      xhttp.open("GET", "/timezoneOffset", true);
-      xhttp.send();
-    }, 10000 ) ;
-
-    setInterval(function ( ) {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById("ntpServer").placeholder = this.responseText;
-        }
-      };
-      xhttp.open("GET", "/ntpServer", true);
-      xhttp.send();
-    }, 10000 ) ;
-
-    setInterval(function ( ) {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById("daylightOffsetSeconds").placeholder = this.responseText;
-        }
-      };
-      xhttp.open("GET", "/daylightOffset", true);
-      xhttp.send();
-    }, 10000 ) ;
-
-    setInterval(function ( ) {
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById("weatherApiId").placeholder = this.responseText;
-        }
-      };
-      xhttp.open("GET", "/weatherApiKey", true);
-      xhttp.send();
-    }, 10000 ) ;
-
     setInterval(function ( ) {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
@@ -282,8 +424,6 @@
       xhttp.open("GET", "/cryptoApiKey", true);
       xhttp.send();
     }, 10000 ) ;
-
-
 
 
 </script>

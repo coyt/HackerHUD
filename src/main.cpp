@@ -41,15 +41,11 @@ extern Crypto_Config myCryptoConfig;
 extern Stock_Config myStockConfig;
 extern time_settings myTimeConfig;
 
-//load variables into these structs here
-//f8ffd4de380fb081bfc12d4ee8c82d29
+//load variables into these structures here
 
 /**************************************************************************************************************************/
 // misc variables:
 /**************************************************************************************************************************/
-const char* ntpServer = myTimeConfig.ntpServer;
-const long  gmtOffset_sec = myTimeConfig.gmtOffset_sec;
-const int   daylightOffset_sec = myTimeConfig.daylightOffset_sec;
 
 unsigned long counter = 0;
 bool colonOnLastLoop = false;
@@ -69,6 +65,10 @@ unsigned long weatherScrollInterval = 0;
 String completeWeatherData = "";
 int stringWeatherDataLength = 0;
 int weatherDataPosition = 0;
+
+long previousGmtOffset;
+int previousDayLightOffset;
+char *previousNTP;
 
 // setting PWM properties
 //const int freq = 440;
@@ -95,7 +95,13 @@ void setup() {
   setupVFD();                                               //setup the VFD
   setupWiFiConfigManager();                                 //setup the wifi config manager
   //connectWifi();                                            //make ESP32 connect to wifi
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer); //init time & connect to NTP server
+  configTime(myTimeConfig.gmtOffset_sec, myTimeConfig.daylightOffset_sec, myTimeConfig.ntpServer); //init time & connect to NTP server
+
+  //save previous value of time config params so we can see if this gets updated later.
+  previousGmtOffset = myTimeConfig.gmtOffset_sec;
+  previousDayLightOffset = myTimeConfig.daylightOffset_sec;
+  previousNTP = myTimeConfig.ntpServer;
+
   firstBoot = true;
 
   //if wifi portal worked successfully AND we're conected to a network - start config server.
@@ -143,6 +149,16 @@ void loop() {
 
     //update display settings
     updateDisplaySettings();
+
+    //check if any time settings need to be updated and execute:
+    if(previousGmtOffset != myTimeConfig.gmtOffset_sec || previousDayLightOffset != myTimeConfig.daylightOffset_sec || previousNTP != myTimeConfig.ntpServer){
+      configTime(myTimeConfig.gmtOffset_sec, myTimeConfig.daylightOffset_sec, myTimeConfig.ntpServer);
+      Serial.println("***** reconfiguring time *****");
+      previousGmtOffset = myTimeConfig.gmtOffset_sec;
+      previousDayLightOffset = myTimeConfig.daylightOffset_sec;
+      previousNTP = myTimeConfig.ntpServer;
+    }
+
   }
 
 
@@ -465,7 +481,20 @@ void updateDisplayBrightness(){
 /**************************************************************************************************************************/
 void updateDisplayFixedItems(){
 
-  updateDisplayTime();
+  if(myTimeConfig.enabled){
+    updateDisplayTime();
+  }
+  else{
+      //move cursor to location where we want time to be displayed
+      //set cursor to 16,1 (X,Y)
+      Serial2.write('\x1B');
+      Serial2.write('\x6C');
+      Serial2.write('\x10'); 
+      Serial2.write('\x01');
+
+      //clear cursor line and clear string mode
+      Serial2.print("     ");
+  }
 
 }
 
