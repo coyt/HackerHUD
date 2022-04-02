@@ -3,35 +3,35 @@ Multi-use retro style IoT desktop display using a Vacuum Fluorescent Display mod
 
 #### VFD Desktop Design V1.0
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/master/media/VFDtwo.jpeg"/>
+<img width="800px" src="/media/VFDtwo.jpeg"/>
 </p>
 
 #### Ethereum Price Frame
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudEthereum.jpeg"/>
+<img width="800px" src="/media/hackerhudEthereum.jpeg"/>
 </p>
 
 #### Bitcoin Price Frame
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudbitcoin.jpeg"/>
+<img width="800px" src="/media/hackerhudbitcoin.jpeg"/>
 </p>
 
 #### Local Weather Frame
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudweather.jpeg"/>
+<img width="800px" src="/media/hackerhudweather.jpeg"/>
 </p>
 
 #### HackerHUD hardware 3D model
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudrenderone.PNG"/>
+<img width="800px" src="/media/hackerhudrenderone.PNG"/>
 </p>
 
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudrendertwo.PNG"/>
+<img width="800px" src="/media/hackerhudrendertwo.PNG"/>
 </p>
 
 <p align="center">
-<img width="800px" src="https://github.com/coyt/HackerHUD/blob/wifimanager/hackerhudrenderthree.PNG"/>
+<img width="800px" src="/media/hackerhudrenderthree.PNG"/>
 </p>
 
 *The Hacker's Heads Up Display*
