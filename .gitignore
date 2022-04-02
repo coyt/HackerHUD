@@ -4,3 +4,6 @@
 .vscode/launch.json
 .vscode/ipch
 src/secrets.hpp
+/scittle/win/bb.exe
+/scittle/win/tidy
+/scittle/win/babashka-windows-amd64.zip
