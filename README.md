@@ -36,6 +36,10 @@ Multi-use retro style IoT desktop display using a Vacuum Fluorescent Display mod
 
 *The Hacker's Heads Up Display*
 
-#### Overview
+## Overview
 
 firmware for the first generation ESP32 based retro desktop display
+
+## config
+
+[config page](/scittle/index.html)
