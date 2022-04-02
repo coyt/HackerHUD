@@ -145,110 +145,64 @@
         else { xhr.open("GET", "/timeBool?timeEnable=0", true); }
         xhr.send();
     }
-
-    function saveTimeZoneOffset() {
-        // Selecting the input element and get its value 
-        let inputVal = document.getElementById("timezoneOffset").value;
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("GET", "/timezoneoffsetRX?timezoneOffset="+inputVal, true);
-
-        xhr.onload = function (e) {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              console.log(xhr.responseText);
-              //clear placeholder value first so the new value is visible
-              document.getElementById("timezoneOffset").value="";
-              document.getElementById("timezoneOffset").placeholder = this.responseText;
-            } else {
-              console.error(xhr.statusText);
-            }
-          }
-        };
-        xhr.onerror = function (e) {
-          console.error(xhr.statusText);
-        };
-
-        xhr.send();
-    }
-
-    function saveNtpServer() {
-        // Selecting the input element and get its value 
-        let inputVal = document.getElementById("ntpServer").value;
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("GET", "/ntpServerRX?ntpServer="+inputVal, true);
-
-        xhr.onload = function (e) {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              console.log(xhr.responseText);
-              //clear placeholder value first so the new value is visible
-              document.getElementById("ntpServer").value="";
-              document.getElementById("ntpServer").placeholder = this.responseText;
-            } else {
-              console.error(xhr.statusText);
-            }
-          }
-        };
-        xhr.onerror = function (e) {
-          console.error(xhr.statusText);
-        };
-
-        xhr.send();
-    }
-
-    function saveDaylightOffset() {
-        // Selecting the input element and get its value 
-        let inputVal = document.getElementById("daylightOffsetSeconds").value;
-        var xhr = new XMLHttpRequest();
-
-        xhr.open("GET", "/daylightOffsetSecondsRX?daylightOffsetSeconds="+inputVal, true);
-
-        xhr.onload = function (e) {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              console.log(xhr.responseText);
-              //clear placeholder value first so the new value is visible
-              document.getElementById("daylightOffsetSeconds").value="";
-              document.getElementById("daylightOffsetSeconds").placeholder = this.responseText;
-            } else {
-              console.error(xhr.statusText);
-            }
-          }
-        };
-        xhr.onerror = function (e) {
-          console.error(xhr.statusText);
-        };
-
-        xhr.send();
-    }
-
-    function updateTimeEnable(){
+    
+    function myGet(url, fun) {
       var xhttp = new XMLHttpRequest();
       xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-          if(this.responseText == 1){
+            fun(this.responseText);
+        }
+      };
+      xhttp.open("GET", url, true);
+      xhttp.send();
+    }
+
+    function myFun(id, url) {
+        // Selecting the input element and get its value 
+        let inputVal = document.getElementById(id).value;
+        myGet(url+inputVal,
+            function (responseText) {
+                  console.log(responseText);
+                  //clear placeholder value first so the new value is visible
+                  document.getElementById(id).value="";
+                  document.getElementById(id).placeholder = responseText;
+            }
+          );
+
+        xhr.send();
+    }
+    
+    function saveTimeZoneOffset(){
+        myFun("timezoneOffset", "/timezoneoffsetRX?timezoneOffset=")
+    }
+
+    function saveNtpServer() {
+        myFun("ntpServer", "/ntpServerRX?ntpServer=")
+    }
+
+    function saveDaylightOffset() {
+        myFun("daylightOffsetSeconds", "/daylightOffsetSecondsRX?daylightOffsetSeconds=")
+    }
+
+    function updateTimeEnable(){
+      myGet("/timeEnableSync",
+        function(responseText) {
+          if(responseText == 1){
             document.getElementById("timeEnabled").checked = true;
           }
           else{
             document.getElementById("timeEnabled").checked = false;
           }   
-        }
-      };
-      xhttp.open("GET", "/timeEnableSync", true);
-      xhttp.send();
+          }
+       );
     }
 
     function updatetimezoneOffset(){
-      var xhttp = new XMLHttpRequest();
-      xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-          document.getElementById("timezoneOffset").placeholder = this.responseText;
-        }
-      };
-      xhttp.open("GET", "/timezoneOffsetSync", true);
-      xhttp.send();
+        myGet("/timezoneOffsetSync",
+          function(responseText) {
+            document.getElementById("timezoneOffset").placeholder = responseText;
+          }
+         );
     }
 
     function updateNtpServer(){
