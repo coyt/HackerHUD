@@ -28,8 +28,6 @@
                         :src "https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"}]
               [:script {:src "https://cdn.jsdelivr.net/npm/scittle@0.1.2/dist/scittle.reagent.js"
                         :type "application/javascript"}]
-              (hiccup.util/raw-string "<script type=\"module\" src=\"https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js\"></script>")
-              (hiccup.util/raw-string "<script nomodule src=\"https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js\"></script>")
               (scittle
                (require '[reagent.core :as r]
                         '[reagent.dom :as rdom])
@@ -62,11 +60,10 @@
               [:title "Hacker-Hud Conf"]]
              [:body
               [:div#app]
-              ;; (hiccup.util/raw-string "<script type=\"module\" src=\"https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js\"></script>")
-              ;; (hiccup.util/raw-string "<script nomodule src=\"https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js\"></script>")
-              ;; [:script {:type "module"
-              ;;           :src "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"}]
-              ;; [:script (hiccup.util/raw-string "nomodule") {:src "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"}]
+              [:script {:type "module"
+                        :src "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"}]
+              [:script {:nomodule ""
+                        :src "https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"}]
               ]]))
 
 (defn spit-html
